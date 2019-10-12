@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /kafka_canal
+
+spring:
+  kafka:
+    bootstrap-servers: 10.2.196.18:9092,10.2.196.19:9092,10.2.196.20:9092
+    producer:
+      retries: 0
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: spring-boot-demo
+      # 手动提交
+      enable-auto-commit: false
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        session.timeout.ms: 60000
+
+    listener:
+      log-container-config: false
+      concurrency: 5
+      # 手动提交
+      ack-mode: manual_immediate
+canal:
+  hostname: 10.2.196.24
+  port: 11111
+  destination: example
+  username: root
+  password: Qwe123!@#
