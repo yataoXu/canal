@@ -20,14 +20,12 @@ public @interface InsertListenPoint {
     /**
      * canal 指令
      * default for all
-     *
      */
     @AliasFor(annotation = ListenPoint.class)
     String destination() default "";
 
     /**
      * 数据库实例
-     *
      */
     @AliasFor(annotation = ListenPoint.class)
     String[] schema() default {};
@@ -35,7 +33,6 @@ public @interface InsertListenPoint {
     /**
      * 监听的表
      * default for all
-     *
      */
     @AliasFor(annotation = ListenPoint.class)
     String[] table() default {};

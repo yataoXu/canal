@@ -28,7 +28,7 @@ public class ListenerPoint {
      *
      * @param target 目标
      * @param method 方法
-     * @param anno 注解类型
+     * @param anno   注解类型
      * @return
      */
     public ListenerPoint(Object target, Method method, ListenPoint anno) {

@@ -18,7 +18,6 @@ import java.util.Set;
  */
 
 
-
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ConfigurationProperties(prefix = "canal")
 public class CanalProperties {
@@ -29,6 +28,7 @@ public class CanalProperties {
 
     /**
      * 返回实例
+     *
      * @param
      * @return
      */
@@ -38,12 +38,14 @@ public class CanalProperties {
 
     /**
      * 设置实例
+     *
      * @param instances
      * @return
      */
     public void setInstances(Map<String, CanalProperties.Instance> instances) {
         this.instances = instances;
     }
+
     /**
      * canal 配置类
      */
@@ -98,7 +100,8 @@ public class CanalProperties {
          */
         private long acquireInterval = 1000;
 
-        public Instance() {}
+        public Instance() {
+        }
 
     }
 

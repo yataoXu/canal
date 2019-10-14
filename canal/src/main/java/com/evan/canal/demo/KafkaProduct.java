@@ -6,6 +6,7 @@ package com.evan.canal.demo;
  * @Author Evan
  * @date 2019.10.12 17:09
  */
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 

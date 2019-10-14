@@ -19,7 +19,6 @@ import java.util.Map;
 
 /**
  * bean 工具类
- *
  */
 @Component
 public class BeanUtil implements ApplicationContextAware {
@@ -36,7 +35,7 @@ public class BeanUtil implements ApplicationContextAware {
      */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        BeanUtil.applicationContext=applicationContext;
+        BeanUtil.applicationContext = applicationContext;
     }
 
     /**

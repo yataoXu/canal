@@ -44,7 +44,6 @@ public class CanalClientConfig {
     private SimpleCanalClient canalClient() {
         log.info("正在尝试连接 canal 客户端....");
         //连接 canal 客户端
-//        CanalClient canalClient = new SimpleCanalClient(canalConfig, MessageTransponders.defaultMessageTransponder());
         SimpleCanalClient canalClient = new SimpleCanalClient(canalProperties);
         log.info("正在尝试开启 canal 客户端....");
         //开启 canal 客户端

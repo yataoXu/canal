@@ -6,6 +6,7 @@ package com.evan.canal.demo;
  * @Author Evan
  * @date 2019.10.12 14:45
  */
+
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.CanalEntry;
