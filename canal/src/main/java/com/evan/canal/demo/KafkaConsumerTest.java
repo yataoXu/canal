@@ -17,7 +17,7 @@ public class KafkaConsumerTest implements Runnable {
     private final KafkaConsumer<String, String> consumer;
     private ConsumerRecords<String, String> msgList;
     private final String topic;
-    private static final String GROUPID = "groupA";
+    private static final String GROUPID ="0";
 
     public KafkaConsumerTest(String topicName) {
         Properties props = new Properties();
@@ -45,14 +45,15 @@ public class KafkaConsumerTest implements Runnable {
                 msgList = consumer.poll(1000);
                 if (null != msgList && msgList.count() > 0) {
                     for (ConsumerRecord<String, String> record : msgList) {
-                        //消费100条就打印 ,但打印的数据不一定是这个规律的
-                        if (messageNo % 100 == 0) {
-                            System.out.println(messageNo + "=======receive: key = " + record.key() + ", value = " + record.value() + " offset===" + record.offset());
-                        }
-                        //当消费了1000条就退出
-                        if (messageNo % 1000 == 0) {
-                            break;
-                        }
+                        System.out.println("=======receive: key ="+record.getClass() );
+//                        //消费100条就打印 ,但打印的数据不一定是这个规律的
+//                        if (messageNo % 100 == 0) {
+//                            System.out.println(messageNo + "=======receive: key = " + record.key() + ", value = " + record.value() + " offset===" + record.offset());
+//                        }
+//                        //当消费了1000条就退出
+//                        if (messageNo % 1000 == 0) {
+//                            break;
+//                        }
                         messageNo++;
                     }
                 } else {
@@ -67,7 +68,7 @@ public class KafkaConsumerTest implements Runnable {
     }
 
     public static void main(String args[]) {
-        KafkaConsumerTest test1 = new KafkaConsumerTest("test");
+        KafkaConsumerTest test1 = new KafkaConsumerTest("example");
         Thread thread1 = new Thread(test1);
         thread1.start();
     }
