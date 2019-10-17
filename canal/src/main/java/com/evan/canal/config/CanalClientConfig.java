@@ -6,8 +6,6 @@ import com.evan.canal.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
@@ -21,8 +19,6 @@ import org.springframework.core.annotation.Order;
  */
 
 @Slf4j
-@Configuration
-@ComponentScan("com.evan.canal")
 public class CanalClientConfig {
 
     @Autowired

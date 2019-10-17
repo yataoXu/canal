@@ -1,36 +1,12 @@
-server:
-  port: 8080
-  servlet:
-    context-path: /kafka_canal
+#false时为单机模式，true时为zookeeper高可用模式
+canal.client.instances.example.clusterEnabled: false
+canal.client.instances.example.host: 10.2.196.24
+#zookeeper 地址
+#canal.client.instances.example.zookeeperAddress: 10.10.2.137:2181,10.10.2.138:2181,10.10.2.139:2181
 
-spring:
-  kafka:
-    bootstrap-servers: 10.2.196.18:9092,10.2.196.19:9092,10.2.196.20:9092
-    producer:
-      retries: 0
-      batch-size: 16384
-      buffer-memory: 33554432
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    consumer:
-      group-id: spring-boot-demo
-      # �ֶ��ύ
-      enable-auto-commit: false
-      auto-offset-reset: latest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        session.timeout.ms: 60000
+canal.client.instances.example.port: 11111
+canal.client.instances.example.batchSize: 1000
+canal.client.instances.example.acquireInterval: 1000
+canal.client.instances.example.retryCount: 20
 
-    listener:
-      log-container-config: false
-      concurrency: 5
-      # �ֶ��ύ
-      ack-mode: manual_immediate
-
-canal:
-  hostname: 10.2.196.24
-  port: 11111
-  destination: example
-  username: root
-  password: Qwe123!@#
+spring.main.allow-bean-definition-overriding: true

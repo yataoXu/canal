@@ -19,7 +19,7 @@ import java.util.Set;
 
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ConfigurationProperties(prefix = "canal")
+@ConfigurationProperties(prefix = "canal.client")
 public class CanalProperties {
     /**
      * 配置信息
@@ -73,12 +73,12 @@ public class CanalProperties {
         /**
          * 集群 设置的用户名
          */
-        private String userName = "";
+        private String userName = "root";
 
         /**
          * 集群 设置的密码
          */
-        private String password = "";
+        private String password = "Qwe123!@#";
 
         /**
          * 批量从 canal 服务器获取数据的最多数目
