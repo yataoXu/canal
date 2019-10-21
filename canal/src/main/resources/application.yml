@@ -10,3 +10,5 @@ canal.client.instances.example.acquireInterval: 1000
 canal.client.instances.example.retryCount: 20
 
 spring.main.allow-bean-definition-overriding: true
+
+access_log_dir: D:/hadoop/mysql/
