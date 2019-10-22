@@ -27,13 +27,19 @@ import java.util.Date;
 @Slf4j
 @Component
 public class CreateMergeSql {
-    public void createInsertEventSql(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
-        StringBuffer sql = new StringBuffer();
+
+    private void initSql(CanalMsg canalMsg, StringBuffer sql){
         sql.append("insert overwrite table ").append(canalMsg.getSchemaName()).append(".")
                 .append(canalMsg.getTableName()).append(" partition(dt='");
+
+    }
+
+    public void createInsertEventSql(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
+        StringBuffer sql = new StringBuffer();
+        initSql(canalMsg,sql);
         // 当前的时间
-        Date date = DateUtil.date();
-        String dateStr = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        String dateStr = DateUtil.format(DateUtil.date(), DatePattern.PURE_DATE_PATTERN);
+
         // 昨天的时间
         Date yesterday = DateUtil.yesterday();
         String yesterdayStr = DateUtil.format(yesterday, DatePattern.PURE_DATE_PATTERN);
@@ -56,11 +62,9 @@ public class CreateMergeSql {
 
     public void createUpdateEventSql(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         StringBuffer sql = new StringBuffer();
-        sql.append("insert overwrite table ").append(canalMsg.getSchemaName()).append(".")
-                .append(canalMsg.getTableName()).append(" partition(dt='");
+        initSql(canalMsg,sql);
         // 当前的时间
-        Date date = DateUtil.date();
-        String dateStr = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        String dateStr = DateUtil.format(DateUtil.date(), DatePattern.PURE_DATE_PATTERN);
 
 
         String aColumnNames = getColumnName(rowChange, "a");
@@ -92,11 +96,9 @@ public class CreateMergeSql {
 
     public void createDeleteEventSql(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         StringBuffer sql = new StringBuffer();
-        sql.append("insert overwrite table ").append(canalMsg.getSchemaName()).append(".")
-                .append(canalMsg.getTableName()).append(" partition(dt='");
+        initSql(canalMsg,sql);
         // 当前的时间
-        Date date = DateUtil.date();
-        String dateStr = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        String dateStr = DateUtil.format(DateUtil.date(), DatePattern.PURE_DATE_PATTERN);
 
         String ttColumnNames = getDeleteColumnName(rowChange, "tt");
         String ttConditions = getDeleteEventConditions(rowChange, "tt");
