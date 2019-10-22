@@ -12,7 +12,9 @@ import com.evan.canal.annotation.dml.DeleteListenPoint;
 import com.evan.canal.annotation.dml.InsertListenPoint;
 import com.evan.canal.annotation.dml.UpdateListenPoint;
 import com.evan.canal.core.CanalMsg;
+import com.evan.canal.transfer.CreateMergeSql;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 
@@ -33,6 +35,9 @@ import java.util.List;
 @Slf4j
 public class MyAnnoEventListener {
 
+    @Autowired
+    private CreateMergeSql createMergeSql;
+
     @Value("${access_log_dir}")
     private final String ACCESS_LOG_DIR = "D:/hadoop/mysql";
 
@@ -40,6 +45,7 @@ public class MyAnnoEventListener {
     public void onEventInsertData(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         log.info("注解方式---新增数据操作");
         InsertOrUpdateDate(rowChange, canalMsg);
+        createMergeSql.createInsertEventSql(canalMsg,rowChange);
     }
 
 
@@ -47,6 +53,7 @@ public class MyAnnoEventListener {
     public void onEventUpdateData(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         log.info("注解方式---更新数据操作");
         InsertOrUpdateDate(rowChange, canalMsg);
+        createMergeSql.createUpdateEventSql(canalMsg,rowChange);
     }
 
     @DeleteListenPoint
@@ -54,6 +61,7 @@ public class MyAnnoEventListener {
 
         log.info("注解方式---删除数据操作");
         DeleteData(rowChange, canalMsg);
+        createMergeSql.createDeleteEventSql(canalMsg,rowChange);
 
 
     }

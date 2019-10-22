@@ -8,6 +8,7 @@ import com.evan.canal.annotation.ListenPoint;
 import com.evan.canal.core.CanalMsg;
 import com.evan.canal.core.ListenerPoint;
 import com.evan.canal.property.CanalProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -25,6 +26,7 @@ import java.util.function.Predicate;
  * @date 2019.10.14 13:29
  */
 
+@Slf4j
 public class DefaultMessageTransponder extends AbstractMessageTransponder {
 
 
@@ -65,10 +67,10 @@ public class DefaultMessageTransponder extends AbstractMessageTransponder {
 
 
     /**
-     *  获取处理的参数
+     * 获取处理的参数
      *
-     * @param method 监听的方法
-     * @param canalMsg 事件的节点
+     * @param method    监听的方法
+     * @param canalMsg  事件的节点
      * @param rowChange 详细参数
      * @return
      */
@@ -158,9 +160,9 @@ public class DefaultMessageTransponder extends AbstractMessageTransponder {
                             Object[] args = getInvokeArgs(method, canalMsg, rowChange);
                             method.invoke(point.getTarget(), args);
                         } catch (Exception e) {
-							/*logger.error("{}: 委托 canal 监听器发生错误! 错误类:{}, 方法名:{}",
-									Thread.currentThread().getName(),
-									point.getTarget().getClass().getName(), method.getName());*/
+                            log.error("{}: 委托 canal 监听器发生错误! 错误类:{}, 方法名:{}",
+                                    Thread.currentThread().getName(),
+                                    point.getTarget().getClass().getName(), method.getName());
                         }
                     }));
         }
