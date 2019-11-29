@@ -13,15 +13,12 @@ import com.evan.canal.annotation.dml.InsertListenPoint;
 import com.evan.canal.annotation.dml.UpdateListenPoint;
 import com.evan.canal.core.CanalMsg;
 import com.evan.canal.transfer.CreateMergeSql;
+import com.evan.canal.util.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +34,8 @@ public class MyAnnoEventListener {
 
     @Autowired
     private CreateMergeSql createMergeSql;
+    @Autowired
+    private FileUtil filesUtil;
 
     @Value("${access_log_dir}")
     private final String ACCESS_LOG_DIR = "D:/hadoop/mysql";
@@ -96,7 +95,7 @@ public class MyAnnoEventListener {
         Date date = DateUtil.date();
         String dateStr = DateUtil.format(date, DatePattern.NORM_DATETIME_MS_PATTERN);
         String columnValue = values.append(rowChange.getEventType()).append("\t").append(dateStr).append("\n").toString();
-        writeFile(canalMsg.getSchemaName(), canalMsg.getTableName() + "_" + rowChange.getEventType().toString().toLowerCase(), columnValue);
+        filesUtil.writeFile(ACCESS_LOG_DIR,canalMsg.getSchemaName(), canalMsg.getTableName() + "_" + rowChange.getEventType().toString().toLowerCase(), columnValue);
     }
 
     @CreateTableListenPoint
@@ -129,50 +128,7 @@ public class MyAnnoEventListener {
     }
 
 
-    public void writeFile(String databaseName, String tableName, String content) {
 
-        FileWriter fw = null;
-        BufferedWriter bw = null;
-        try {
-            File srcDir = srcDirFolder(databaseName, tableName);
-            fw = new FileWriter(srcDir, true);
-            bw = new BufferedWriter(fw);
-            fw.write(content);
-            fw.flush();
-            fw.close();
-            bw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (null != fw) {
-                    fw.close();
-                }
-                if (null != bw) {
-                    bw.close();
-                }
-                bw = null;
-                fw = null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private File srcDirFolder(String databaseName, String tableName) throws IOException {
-
-        String now = DateUtil.today();
-        File srcDirFile = new File(ACCESS_LOG_DIR + "/" + databaseName + "/" + tableName + "/" + tableName + now);
-        if (!srcDirFile.getParentFile().exists()) {
-            boolean mkdirs = srcDirFile.getParentFile().mkdirs();
-            if (!mkdirs) {
-                log.error("{}父文件夹创建失败", srcDirFile);
-                throw new RuntimeException("父文件夹创建失败");
-            }
-        }
-        srcDirFile.createNewFile();
-        return srcDirFile;
-    }
 
 
 }
