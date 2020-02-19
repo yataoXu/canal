@@ -1,8 +1,8 @@
 #false时为单机模式，true时为zookeeper高可用模式
-canal.client.instances.example.clusterEnabled: true
-#canal.client.instances.example.host: 10.2.196.24
+canal.client.instances.example.clusterEnabled: false
+canal.client.instances.example.host: 10.2.192.31
 #zookeeper 地址
-canal.client.instances.example.zookeeperAddress: 10.2.192.231:2181,10.2.192.232:2181,10.2.192.233:2181
+#canal.client.instances.example.zookeeperAddress: 10.2.192.231:2181,10.2.192.232:2181,10.2.192.233:2181
 
 canal.client.instances.example.port: 11111
 canal.client.instances.example.batchSize: 1000

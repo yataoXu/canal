@@ -1,6 +1,8 @@
 package com.evan.core;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @Description Canal 的一些信息
@@ -10,6 +12,8 @@ import lombok.Data;
  */
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CanalMsg {
     /**
      * 指令

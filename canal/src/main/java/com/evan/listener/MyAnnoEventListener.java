@@ -1,6 +1,6 @@
 package com.evan.listener;
 
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.evan.annotation.CanalEventListener;
 import com.evan.annotation.ddl.AlertTableListenPoint;
@@ -11,12 +11,14 @@ import com.evan.annotation.dml.DeleteListenPoint;
 import com.evan.annotation.dml.InsertListenPoint;
 import com.evan.annotation.dml.UpdateListenPoint;
 import com.evan.core.CanalMsg;
+import com.evan.service.CreateSqlService;
 import com.evan.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @CanalEventListener
@@ -24,19 +26,19 @@ import java.util.List;
 public class MyAnnoEventListener {
 
 
-
+    private CreateSqlService createSqlService;
 
     @InsertListenPoint
     public void onEventInsertData(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         log.info("新增数据操作");
 
-        initWriteData(rowChange, canalMsg);
+        getColumnDataOfInsert(rowChange, canalMsg);
     }
 
     @UpdateListenPoint
     public void onEventUpdateData(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         log.info("更新数据操作");
-        initWriteData(rowChange, canalMsg);
+        getColumnDataInsertOfUpdate(rowChange, canalMsg);
     }
 
     @DeleteListenPoint
@@ -58,14 +60,13 @@ public class MyAnnoEventListener {
     }
 
     private void writeDatAdd(StringBuffer values, String eventType, String schemaName, String tableName) {
-        values.append(eventType).append("\t").append(DateUtil.now()).append("\n");
-        String content = values.toString();
-        log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, eventType, content);
-        FileUtils.writeFile(eventType, schemaName, tableName, content);
+        log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, eventType, values);
+        FileUtils.writeFile(eventType, schemaName, tableName, values.toString());
     }
 
 
-    private void initWriteData(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
+    private void getColumnDataOfInsert(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
+
         String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
 
@@ -76,6 +77,33 @@ public class MyAnnoEventListener {
             rowData.getAfterColumnsList().forEach((c) -> {
                 values.append(c.getValue() + "\t");
             });
+
+            createSqlService.createInsertSql(canalMsg, values.toString());
+            writeDatAdd(values, eventType, schemaName, tableName);
+        }
+    }
+
+    private void getColumnDataInsertOfUpdate(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
+
+        String eventType = rowChange.getEventType().toString();
+        List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
+
+        for (CanalEntry.RowData rowData : rowDatasList) {
+            String schemaName = canalMsg.getSchemaName();
+            String tableName = canalMsg.getTableName();
+            StringBuffer columnName = new StringBuffer();
+            StringBuffer values = new StringBuffer();
+            Map<String, String> kv = MapUtil.newHashMap();
+            for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
+                boolean isKey = column.getIsKey();
+                if (isKey) {
+                    kv.put("key", column.getName());
+                    kv.put("value", column.getValue());
+                }
+                columnName.append(column.getName() + "\t");
+                values.append(column.getValue() + "\t");
+            }
+            createSqlService.createUpdateSql(canalMsg, kv, columnName.toString());
             writeDatAdd(values, eventType, schemaName, tableName);
         }
     }

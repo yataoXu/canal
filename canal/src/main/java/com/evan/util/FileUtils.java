@@ -2,8 +2,6 @@ package com.evan.util;
 
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,12 +18,8 @@ import java.io.IOException;
 @Slf4j
 public class FileUtils {
 
-//    @Value("${access_log_dir}")
     private static String ACCESS_LOG_DIR = "F:/hadoop/mysql/";
-//    @Value("${bakup_log_dir}")
-//    private String TO_UPLOAD_LOG_DIR;
-//    @Value("${to_upload_log_dir}")
-//    private String BAKUP_LOG_DIR;
+
 
 
     public static void writeFile(String eventType, String SchemaName, String tableName, String content) {
