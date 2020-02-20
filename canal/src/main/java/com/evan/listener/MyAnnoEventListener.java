@@ -85,16 +85,23 @@ public class MyAnnoEventListener {
         String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
 
+        boolean flage =true;
         for (CanalEntry.RowData rowData : rowDatasList) {
             String schemaName = canalMsg.getSchemaName();
             String tableName = canalMsg.getTableName();
             StringBuffer values = new StringBuffer();
+            StringBuffer columnName = new StringBuffer();
+
             rowData.getAfterColumnsList().forEach((c) -> {
                 values.append(c.getValue() + "\t");
+                columnName.append(c.getName() + "\t");
             });
 
-            String insertSql = createSqlService.createInsertSql(canalMsg, values.toString());
-            writeData(insertSql,eventType + "Sql", schemaName, tableName);
+            if (flage) {
+                String insertSql = createSqlService.createInsertSql(canalMsg, columnName.toString());
+                writeData(insertSql, eventType + "Sql", schemaName, tableName);
+                flage =false;
+            }
             writeData(values.toString(), eventType, schemaName, tableName);
         }
     }

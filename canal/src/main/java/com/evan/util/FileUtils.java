@@ -18,9 +18,7 @@ import java.io.IOException;
 @Slf4j
 public class FileUtils {
 
-    private static String ACCESS_LOG_DIR = "F:/hadoop/mysql/";
-
-
+    public  static final String ACCESS_LOG_DIR = "F:/hadoop/mysql/";
 
     public static void writeFile(String eventType, String SchemaName, String tableName, String content) {
 
@@ -56,7 +54,7 @@ public class FileUtils {
 
         String now = DateUtil.today();
 
-        File srcDirFile = new File(ACCESS_LOG_DIR + "/" + schemaName + "/" + "/" + tableName + "/" + tableName + "_" + now);
+        File srcDirFile = new File(ACCESS_LOG_DIR + "/" + schemaName + "/" + "/" + tableName + "/" + now + "/" + tableName);
         if (!srcDirFile.getParentFile().exists()) {
             boolean mkdirs = srcDirFile.getParentFile().mkdirs();
             if (!mkdirs) {
