@@ -13,7 +13,7 @@ import org.springframework.core.annotation.Order;
 
 /**
  * @Description
- * @ClassName TestConfig
+ * @ClassName CanalClientConfig
  * @Author Evan
  * @date 2019.10.13 20:32
  */

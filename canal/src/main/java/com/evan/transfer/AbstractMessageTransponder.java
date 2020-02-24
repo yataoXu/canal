@@ -86,12 +86,6 @@ public abstract class AbstractMessageTransponder implements MessageTransponder {
         }
     }
 
-    /**
-     * 线程搞起来
-     *
-     * @param
-     * @return
-     */
     @Override
     public void run() {
         //错误重试次数

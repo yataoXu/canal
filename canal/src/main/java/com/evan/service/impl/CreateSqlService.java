@@ -1,4 +1,4 @@
-package com.evan.service;
+package com.evan.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
@@ -114,12 +114,12 @@ public class CreateSqlService {
     }
 
 
-    //load data local inpath '/root/evan/haha' into table haha partition(dt='20200218');
-    public String createLoadSql(String inPath,CanalMsg canalMsg ){
+    // load data local inpath '/root/evan/haha' into table haha partition(dt='20200218');
+    public String createLoadSql(String inPath, CanalMsg canalMsg) {
         DateTime yesterday = DateUtil.yesterday();
-        StringBuffer sb =  new StringBuffer();
+        StringBuffer sb = new StringBuffer();
         sb.append("load data local inpath '").append(inPath).append("' into table")
-                .append(canalMsg.getSchemaName()+"."+canalMsg.getTableName()).append(" partition(dt='")
+                .append(canalMsg.getSchemaName() + "." + canalMsg.getTableName()).append(" partition(dt='")
                 .append(yesterday.toString(DatePattern.PURE_DATE_PATTERN)).append("');");
         return sb.toString();
     }
