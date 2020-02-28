@@ -1,10 +1,12 @@
 package com.evan.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.evan.config.property.HiveDruidProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,57 +22,44 @@ import javax.sql.DataSource;
 
 @Slf4j
 @Configuration
-@ConfigurationProperties(prefix = "hive")
-@Data
+@EnableConfigurationProperties(HiveDruidProperty.class)
 public class HiveDruidConfig {
-    private String url;
-    private String user;
-    private String password;
-    private String driverClassName;
-    private int initialSize;
-    private int minIdle;
-    private int maxActive;
-    private int maxWait;
-    private int timeBetweenEvictionRunsMillis;
-    private int minEvictableIdleTimeMillis;
-    private String validationQuery;
-    private boolean testWhileIdle;
-    private boolean testOnBorrow;
-    private boolean testOnReturn;
-    private boolean poolPreparedStatements;
-    private int maxPoolPreparedStatementPerConnectionSize;
+
+    HiveDruidProperty hiveDruidProperty;
+
+    public HiveDruidConfig(HiveDruidProperty hiveDruidProperty) {
+        this.hiveDruidProperty = hiveDruidProperty;
+    }
+
 
     @Bean(name = "hiveDruidDataSource")
     @Qualifier("hiveDruidDataSource")
     public DataSource dataSource() {
         DruidDataSource datasource = new DruidDataSource();
-        datasource.setUrl(url);
-        datasource.setUsername(user);
-        datasource.setPassword(password);
-        datasource.setDriverClassName(driverClassName);
+        datasource.setUrl(hiveDruidProperty.getUrl());
+        datasource.setUsername(hiveDruidProperty.getUser());
+        datasource.setPassword(hiveDruidProperty.getPassword());
+        datasource.setDriverClassName(hiveDruidProperty.getDriverClassName());
 
         // pool configuration
-        datasource.setInitialSize(initialSize);
-        datasource.setMinIdle(minIdle);
-        datasource.setMaxActive(maxActive);
-        datasource.setMaxWait(maxWait);
-        datasource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-        datasource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-        datasource.setValidationQuery(validationQuery);
-        datasource.setTestWhileIdle(testWhileIdle);
-        datasource.setTestOnBorrow(testOnBorrow);
-        datasource.setTestOnReturn(testOnReturn);
-        datasource.setPoolPreparedStatements(poolPreparedStatements);
-        datasource.setMaxPoolPreparedStatementPerConnectionSize(
-                maxPoolPreparedStatementPerConnectionSize);
+        datasource.setInitialSize(hiveDruidProperty.getInitialSize());
+        datasource.setMinIdle(hiveDruidProperty.getMinIdle());
+        datasource.setMaxActive(hiveDruidProperty.getMaxActive());
+        datasource.setMaxWait(hiveDruidProperty.getMaxWait());
+        datasource.setTimeBetweenEvictionRunsMillis(hiveDruidProperty.getTimeBetweenEvictionRunsMillis());
+        datasource.setMinEvictableIdleTimeMillis(hiveDruidProperty.getMinEvictableIdleTimeMillis());
+        datasource.setValidationQuery(hiveDruidProperty.getValidationQuery());
+        datasource.setTestWhileIdle(hiveDruidProperty.getTestWhileIdle());
+        datasource.setTestOnBorrow(hiveDruidProperty.getTestOnBorrow());
+        datasource.setTestOnReturn(hiveDruidProperty.getTestOnReturn());
+        datasource.setPoolPreparedStatements(hiveDruidProperty.getPoolPreparedStatements());
+        datasource.setMaxPoolPreparedStatementPerConnectionSize(hiveDruidProperty.getMaxPoolPreparedStatementPerConnectionSize());
         return datasource;
     }
 
-    // 此处省略各个属性的get和set方法
 
     @Bean(name = "hiveDruidTemplate")
-    public JdbcTemplate hiveDruidTemplate(
-            @Qualifier("hiveDruidDataSource") DataSource dataSource) {
+    public JdbcTemplate hiveDruidTemplate(@Qualifier("hiveDruidDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 

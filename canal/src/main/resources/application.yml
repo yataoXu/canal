@@ -13,7 +13,7 @@ spring.main.allow-bean-definition-overriding: true
 
 
 hive:
-  url: jdbc:hive2://10.2.192.31:10000
+  url: jdbc:hive2://10.2.192.233:10000
   driver-class-name: org.apache.hive.jdbc.HiveDriver
   type: com.alibaba.druid.pool.DruidDataSource
   user: hive
@@ -36,3 +36,8 @@ hive:
   # 打开PSCache，并且指定每个连接上PSCache的大小
   poolPreparedStatements: true
   maxPoolPreparedStatementPerConnectionSize: 20
+
+
+  hadoop.name-node: hdfs://10.2.192.236:9000
+  hadoop.namespace: /nias
+
