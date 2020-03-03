@@ -42,13 +42,12 @@ public class MyAnnoEventListener {
     public void onEventDeleteData(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
 
         log.info("删除数据操作");
-        String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
         for (CanalEntry.RowData rowData : rowDataList) {
             StringBuffer values = getColumnValue(rowData);
             values.append("\n");
             String deleteDir = configParams.getDeletedDirMerge();
-            writeData(deleteDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
+            writeData(deleteDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName());
         }
     }
 
@@ -61,28 +60,26 @@ public class MyAnnoEventListener {
         return values;
     }
 
-    private void writeData(String path, String content, String eventType, String schemaName, String tableName) {
-        log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, eventType, content);
+    private void writeData(String path, String content, String schemaName, String tableName) {
+        log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, content);
         FileUtils.writeFile(path, schemaName, tableName, content);
     }
 
 
     private void getColumnDataOfInsert(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
 
-        String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
         for (CanalEntry.RowData rowData : rowDataList) {
             StringBuffer values = getColumnValue(rowData);
             values.append("\n");
             String insertDir = configParams.getInsertDirMerge();
-            writeData(insertDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
+            writeData(insertDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName());
         }
     }
 
     private void getColumnDataOfUpdate(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
 
-        String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
         for (CanalEntry.RowData rowData : rowDataList) {
@@ -95,7 +92,7 @@ public class MyAnnoEventListener {
             values.append("\n");
 
             String updateDir = configParams.getUpdateDirMerge();
-            writeData(updateDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
+            writeData(updateDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName());
         }
     }
 

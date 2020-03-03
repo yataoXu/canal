@@ -6,7 +6,9 @@ import com.evan.config.property.ConfigParams;
 import com.evan.core.TableDetail;
 import com.evan.dao.BaseDao;
 import com.evan.service.DataMergeService;
+import com.evan.util.FileUtils;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,35 +33,6 @@ public class DataMergeServiceImpl implements DataMergeService {
 
     @Autowired
     ConfigParams configParams;
-
-
-    public void dataMergeDelete(String databaseName) throws IOException, SQLException {
-
-        String path = configParams.getDeletedDirMerge();
-        // 获得上传的文件夹
-        File insertDir = new File(path, databaseName);
-        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
-
-            String line = null;
-            TableDetail tableDetail = new TableDetail();
-            tableDetail.setDatabase(databaseName);
-            tableDetail.setFile(f);
-            mergeInit(tableDetail);
-
-            while (true) {
-                try {
-                    if (!((line = tableDetail.getBfreader().readLine()) != null)) break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                remove(tableDetail.getData(), line);
-            }
-
-            // 将merge好的list load 到hive
-            String filePaht = "";
-            baseDao.loadToTable(filePaht, databaseName, f.getName());
-        });
-    }
 
     public void mergeInit(TableDetail tableDetail) {
         InputStreamReader reader;
@@ -96,10 +69,40 @@ public class DataMergeServiceImpl implements DataMergeService {
         }
     }
 
+    public void dataMergeDelete(String databaseName) throws IOException, SQLException {
+
+        String path = configParams.getDeletedDirMerge();
+        // 获得上传的文件夹
+        File insertDir = new File(path, databaseName);
+        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+
+            String line = null;
+            TableDetail tableDetail = new TableDetail();
+            tableDetail.setDatabase(databaseName);
+            tableDetail.setFile(f);
+            mergeInit(tableDetail);
+
+            while (true) {
+                try {
+                    if (!((line = tableDetail.getBfreader().readLine()) != null)) break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                remove(tableDetail.getData(), line);
+            }
+
+
+            // 将merge好的list落地
+            List<String> allData = tableDetail.getData();
+            String updateUploadPath = configParams.getDeletedDirUpload() + databaseName + f.getName() + f.getName();
+            writeDiskOfUploadData(updateUploadPath,databaseName,f.getName(),allData);
+
+            // 将merge好的list load 到hive
+            baseDao.loadToTable(updateUploadPath, databaseName, f.getName());
+        });
+    }
 
     public void dataMergeUpdate(String databaseName) throws IOException, SQLException {
-
-
         String path = configParams.getUpdateDirMerge();
 
         // 获得上传的文件夹
@@ -112,7 +115,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             mergeInit(tableDetail);
 
 
-            Map<String, String> map = MapUtil.newHashMap();
+            Map<String, String> map = Maps.newLinkedHashMap();
             String line = null;
             while (true) {
                 try {
@@ -125,13 +128,20 @@ public class DataMergeServiceImpl implements DataMergeService {
             }
 
             for (Map.Entry<String, String> param : map.entrySet()) {
-                for (int i = tableDetail.getData().size() - 1; i >= 0; i--) {
+                for (int i = 0; i < tableDetail.getData().size() - 1; i++) {
                     if (tableDetail.getData().get(i).equals(param.getKey())) {
                         tableDetail.getData().remove(tableDetail.getData().get(i));
                         tableDetail.getData().add(param.getValue());
                     }
                 }
             }
+
+
+            // 将merge好的list落地
+            List<String> allData = tableDetail.getData();
+            String updateUploadPath = configParams.getInsertDirUpload() + databaseName + f.getName() + f.getName();
+            writeDiskOfUploadData(updateUploadPath,databaseName,f.getName(),allData);
+
 
             // 将merge好的list load 到hive
             String filePaht = "";
@@ -151,7 +161,6 @@ public class DataMergeServiceImpl implements DataMergeService {
             tableDetail.setFile(f);
             mergeInit(tableDetail);
 
-
             String line = null;
             while (true) {
                 try {
@@ -161,21 +170,25 @@ public class DataMergeServiceImpl implements DataMergeService {
                 }
                 addList.add(line);
             }
-            if (!addList.isEmpty()){
+            if (!addList.isEmpty()) {
                 tableDetail.getData().addAll(addList);
             }
             tableDetail.getData().stream().forEach(System.out::println);
 
             // 将merge好的list落地
-
-
-
+            List<String> allData = tableDetail.getData();
+            String insertUploadPath = configParams.getInsertDirUpload() + databaseName + f.getName() + f.getName();
+            writeDiskOfUploadData(insertUploadPath,databaseName,f.getName(),allData);
 
             // 将merge好的list load 到hive
-            String filePath = configParams.getInsertDirUpload();
-            baseDao.loadToTable(filePath, databaseName, f.getName());
+            baseDao.loadToTable(insertUploadPath, databaseName, f.getName());
         });
     }
 
+    public void writeDiskOfUploadData(String path ,String databaseName,String tableName,List<String> data) {
+        log.info("库名：{},表名：{}，数据：{}", databaseName, tableName, data);
+        String allDataString = String.join("\n", data);
+        FileUtils.writeFile(path, databaseName, tableName, allDataString);
 
+    }
 }

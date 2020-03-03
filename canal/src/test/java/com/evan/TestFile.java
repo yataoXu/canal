@@ -181,17 +181,19 @@ public class TestFile {
         afterList.add("afterList3");
         afterList.add("afterList4");
 
-        Map<String,String> map = Maps.newLinkedHashMap();
+//        Map<String,String> map = Maps.newLinkedHashMap();
+//
+//        for (int i = 0; i < beforeList.size(); i++) {
+//            if(StringUtils.isNotBlank(beforeList.get(i)) &&StringUtils.isNotBlank(afterList.get(i))){
+//                map.put(beforeList.get(i),afterList.get(i));
+//            }
+//        }
+//
+//        map.forEach((k,v)->{
+//            System.out.println(k+":"+v);
+//        });
 
-        for (int i = 0; i < beforeList.size(); i++) {
-            if(StringUtils.isNotBlank(beforeList.get(i)) &&StringUtils.isNotBlank(afterList.get(i))){
-                map.put(beforeList.get(i),afterList.get(i));
-            }
-        }
-
-        map.forEach((k,v)->{
-            System.out.println(k+":"+v);
-        });
-
+        String join = String.join("\n", afterList);
+        System.out.println(join);
     }
 }
