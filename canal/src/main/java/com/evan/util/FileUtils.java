@@ -1,6 +1,7 @@
 package com.evan.util;
 
 import cn.hutool.core.date.DateUtil;
+import com.evan.config.property.ConfigParams;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
@@ -18,14 +19,12 @@ import java.io.IOException;
 @Slf4j
 public class FileUtils {
 
-    public  static final String ACCESS_LOG_DIR = "F:/hadoop/mysql/";
-
-    public static void writeFile(String eventType, String SchemaName, String tableName, String content) {
+    public static void writeFile(String path, String SchemaName, String tableName, String content) {
 
         FileWriter fw = null;
         BufferedWriter bw = null;
         try {
-            File srcDir = srcDirFolder(eventType, SchemaName, tableName);
+            File srcDir = srcDirFolder(SchemaName, tableName, path);
             fw = new FileWriter(srcDir, true);
             bw = new BufferedWriter(fw);
             fw.write(content);
@@ -50,11 +49,11 @@ public class FileUtils {
         }
     }
 
-    private static File srcDirFolder(String eventType, String schemaName, String tableName) throws IOException {
+    private static File srcDirFolder(String schemaName, String tableName, String path) throws IOException {
 
         String now = DateUtil.today();
 
-        File srcDirFile = new File(ACCESS_LOG_DIR + "/" + schemaName + "/" + "/" + tableName + "/" + now + "/" + tableName);
+        File srcDirFile = new File(path + "/" + schemaName + "/" + "/" + tableName  + "/" + tableName);
         if (!srcDirFile.getParentFile().exists()) {
             boolean mkdirs = srcDirFile.getParentFile().mkdirs();
             if (!mkdirs) {

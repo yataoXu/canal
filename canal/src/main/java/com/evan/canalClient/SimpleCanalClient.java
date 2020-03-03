@@ -4,7 +4,7 @@ import com.alibaba.otter.canal.client.CanalConnector;
 import com.evan.annotation.CanalEventListener;
 import com.evan.annotation.ListenPoint;
 import com.evan.core.ListenerPoint;
-import com.evan.property.CanalProperties;
+import com.evan.config.property.CanalProperties;
 import com.evan.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.AnnotationUtils;

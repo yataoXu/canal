@@ -23,11 +23,6 @@ public class HiveJdbcTemplateController {
     @Qualifier("hiveDruidTemplate")
     private JdbcTemplate hiveDruidTemplate;
 
-    @Autowired
-    @Qualifier("hiveJdbcTemplate")
-    private JdbcTemplate hiveJdbcTemplate;
-
-
     /**
      * 示例：创建新表
      */
@@ -94,7 +89,7 @@ public class HiveJdbcTemplateController {
      */
     @RequestMapping("/table/delete")
     public String delete(String tableName) {
-        String sql = "DROP TABLE IF EXISTS "+tableName;
+        String sql = "DROP TABLE IF EXISTS " + tableName;
         String result = "Drop table successfully...";
         log.info("Running: " + sql);
         try {

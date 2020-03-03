@@ -6,7 +6,7 @@ import com.alibaba.otter.canal.protocol.Message;
 import com.alibaba.otter.canal.protocol.exception.CanalClientException;
 import com.evan.annotation.CanalEventListener;
 import com.evan.core.ListenerPoint;
-import com.evan.property.CanalProperties;
+import com.evan.config.property.CanalProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

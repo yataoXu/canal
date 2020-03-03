@@ -1,6 +1,5 @@
 package com.evan.listener;
 
-import cn.hutool.core.map.MapUtil;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.evan.annotation.CanalEventListener;
 import com.evan.annotation.ddl.AlertTableListenPoint;
@@ -10,6 +9,7 @@ import com.evan.annotation.ddl.DropTableListenPoint;
 import com.evan.annotation.dml.DeleteListenPoint;
 import com.evan.annotation.dml.InsertListenPoint;
 import com.evan.annotation.dml.UpdateListenPoint;
+import com.evan.config.property.ConfigParams;
 import com.evan.core.CanalMsg;
 import com.evan.service.impl.CreateSqlService;
 import com.evan.util.FileUtils;
@@ -18,14 +18,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @CanalEventListener
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class MyAnnoEventListener {
 
-    private CreateSqlService createSqlService;
+    private final CreateSqlService createSqlService;
+    private final ConfigParams configParams;
 
     @InsertListenPoint
     public void onEventInsertData(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
@@ -37,7 +37,7 @@ public class MyAnnoEventListener {
     @UpdateListenPoint
     public void onEventUpdateData(CanalMsg canalMsg, CanalEntry.RowChange rowChange) {
         log.info("更新数据操作");
-        getColumnDataInsertOfUpdate(rowChange, canalMsg);
+        getColumnDataOfUpdate(rowChange, canalMsg);
     }
 
     @DeleteListenPoint
@@ -45,96 +45,61 @@ public class MyAnnoEventListener {
 
         log.info("删除数据操作");
         String eventType = rowChange.getEventType().toString();
-        List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
-        boolean flage = true;
-        for (CanalEntry.RowData rowData : rowDatasList) {
-            String schemaName = canalMsg.getSchemaName();
-            String tableName = canalMsg.getTableName();
-            StringBuffer columnName = new StringBuffer();
+        List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
+        for (CanalEntry.RowData rowData : rowDataList) {
             StringBuffer values = new StringBuffer();
-            Map<String, String> kv = MapUtil.newHashMap();
 
             for (CanalEntry.Column column : rowData.getBeforeColumnsList()) {
-                boolean isKey = column.getIsKey();
-                if (isKey) {
-                    kv.put("key", column.getName());
-                    kv.put("value", column.getValue());
-                }
-                columnName.append(column.getName() + "\t");
                 values.append(column.getValue() + "\t");
             }
-
-            writeData(values.toString(), eventType, schemaName, tableName);
-
-            if (flage) {
-                String deleteSql = createSqlService.createDeleteSql(canalMsg, kv, columnName.toString());
-                writeData(deleteSql, eventType + "Sql", schemaName, schemaName);
-                flage = false;
-            }
+            String deleteDir = configParams.getDeletedDirMerge();
+            writeData(deleteDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
         }
     }
 
-    private void writeData(String content, String eventType, String schemaName, String tableName) {
+    private void writeData(String path, String content, String eventType, String schemaName, String tableName) {
         log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, eventType, content);
-        FileUtils.writeFile(eventType, schemaName, tableName, content);
+        FileUtils.writeFile(path, schemaName, tableName, content);
     }
 
 
     private void getColumnDataOfInsert(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
 
         String eventType = rowChange.getEventType().toString();
-        List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
+        List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
-        boolean flage =true;
-        for (CanalEntry.RowData rowData : rowDatasList) {
-            String schemaName = canalMsg.getSchemaName();
-            String tableName = canalMsg.getTableName();
+        for (CanalEntry.RowData rowData : rowDataList) {
             StringBuffer values = new StringBuffer();
-            StringBuffer columnName = new StringBuffer();
-
             rowData.getAfterColumnsList().forEach((c) -> {
                 values.append(c.getValue() + "\t");
-                columnName.append(c.getName() + "\t");
             });
 
-            if (flage) {
-                String insertSql = createSqlService.createInsertSql(canalMsg, columnName.toString());
-                writeData(insertSql, eventType + "Sql", schemaName, tableName);
-                flage =false;
-            }
-            writeData(values.toString(), eventType, schemaName, tableName);
+            String insertDir = configParams.getInsertDirMerge();
+            writeData(insertDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
         }
     }
 
-    private void getColumnDataInsertOfUpdate(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
+    private void getColumnDataOfUpdate(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
 
         String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
 
-        boolean flage = true;
         for (CanalEntry.RowData rowData : rowDatasList) {
-            String schemaName = canalMsg.getSchemaName();
-            String tableName = canalMsg.getTableName();
-            StringBuffer columnName = new StringBuffer();
             StringBuffer values = new StringBuffer();
-            Map<String, String> kv = MapUtil.newHashMap();
-            for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
-                boolean isKey = column.getIsKey();
-                if (isKey) {
-                    kv.put("key", column.getName());
-                    kv.put("value", column.getValue());
-                }
-                columnName.append(column.getName() + "\t");
+            for (CanalEntry.Column column : rowData.getBeforeColumnsList()) {
                 values.append(column.getValue() + "\t");
             }
-            if (flage) {
-                String updateSql = createSqlService.createUpdateSql(canalMsg, kv, columnName.toString());
-                writeData(updateSql, eventType + "Sql", schemaName, schemaName);
-                flage = false;
+            values.deleteCharAt(values.length() - 1);
+            values.append(",");
+            for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
+                values.append(column.getValue() + "\t");
             }
-            writeData(values.toString(), eventType, schemaName, tableName);
+
+            String updateDir = configParams.getUpdateDirMerge();
+            writeData(updateDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
         }
     }
+
 
     @CreateTableListenPoint
     public void onEventCreateTable(CanalEntry.RowChange rowChange) {

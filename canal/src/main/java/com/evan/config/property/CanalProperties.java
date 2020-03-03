@@ -1,4 +1,4 @@
-package com.evan.property;
+package com.evan.config.property;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

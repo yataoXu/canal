@@ -8,7 +8,7 @@ package com.evan.annotation;
  */
 
 import com.evan.config.CanalClientConfig;
-import com.evan.property.CanalProperties;
+import com.evan.config.property.CanalProperties;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

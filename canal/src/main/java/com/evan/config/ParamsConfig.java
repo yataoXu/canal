@@ -23,8 +23,7 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties(ConfigParams.class)
 public class ParamsConfig {
 
-
-    ConfigParams configParams;
+    private final ConfigParams configParams;
 
     public ParamsConfig(ConfigParams configParams) {
         this.configParams = configParams;

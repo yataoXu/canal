@@ -15,10 +15,12 @@ import javax.jdo.annotations.Value;
 @Data
 public class ConfigParams {
 
-    private String deletedDir;
-
-    private String updateDir;
-    private String insertDir;
+    private String deletedDirMerge;
+    private String deletedDirUpload;
+    private String updateDirMerge;
+    private String updateDirUpload;
+    private String insertDirMerge;
+    private String insertDirUpload;
 
 
 }

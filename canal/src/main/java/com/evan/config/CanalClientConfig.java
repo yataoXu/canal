@@ -1,7 +1,7 @@
 package com.evan.config;
 
 import com.evan.canalClient.SimpleCanalClient;
-import com.evan.property.CanalProperties;
+import com.evan.config.property.CanalProperties;
 import com.evan.util.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

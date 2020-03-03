@@ -3,7 +3,7 @@ package com.evan.canalClient;
 import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.client.CanalConnectors;
 import com.alibaba.otter.canal.protocol.exception.CanalClientException;
-import com.evan.property.CanalProperties;
+import com.evan.config.property.CanalProperties;
 import com.evan.transfer.DefaultMessageTransponder;
 import com.evan.transfer.TransponderFactory;
 import org.apache.commons.lang.StringUtils;

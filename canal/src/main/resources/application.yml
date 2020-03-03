@@ -38,6 +38,12 @@ hive:
   maxPoolPreparedStatementPerConnectionSize: 20
 
 
-  hadoop.name-node: hdfs://10.2.192.236:9000
-  hadoop.namespace: /nias
 
+dir:
+  dst_data_dir: /tmp/database/test
+  deletedDirUpload: F:/hadoop/mysql/upload/delete
+  deletedDirMerge: F:/hadoop/mysql/merge/delete
+  updateDirUpload: F:/hadoop/mysql/upload/update
+  updateDirMerge: F:/hadoop/mysql/merge/update
+  insertDirUpload: F:/hadoop/mysql/upload/insert
+  insertDirMerge: F:/hadoop/mysql/merge/insert
