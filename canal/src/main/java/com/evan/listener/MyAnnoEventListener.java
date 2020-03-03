@@ -11,7 +11,6 @@ import com.evan.annotation.dml.InsertListenPoint;
 import com.evan.annotation.dml.UpdateListenPoint;
 import com.evan.config.property.ConfigParams;
 import com.evan.core.CanalMsg;
-import com.evan.service.impl.CreateSqlService;
 import com.evan.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class MyAnnoEventListener {
 
-    private final CreateSqlService createSqlService;
     private final ConfigParams configParams;
 
     @InsertListenPoint
@@ -47,14 +45,20 @@ public class MyAnnoEventListener {
         String eventType = rowChange.getEventType().toString();
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
         for (CanalEntry.RowData rowData : rowDataList) {
-            StringBuffer values = new StringBuffer();
-
-            for (CanalEntry.Column column : rowData.getBeforeColumnsList()) {
-                values.append(column.getValue() + "\t");
-            }
+            StringBuffer values = getColumnValue(rowData);
+            values.append("\n");
             String deleteDir = configParams.getDeletedDirMerge();
             writeData(deleteDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
         }
+    }
+
+    private StringBuffer getColumnValue(CanalEntry.RowData rowData) {
+        StringBuffer values = new StringBuffer();
+        for (CanalEntry.Column column : rowData.getBeforeColumnsList()) {
+            values.append(column.getValue() + "\t");
+        }
+        values.deleteCharAt(values.length() - 1);
+        return values;
     }
 
     private void writeData(String path, String content, String eventType, String schemaName, String tableName) {
@@ -69,11 +73,8 @@ public class MyAnnoEventListener {
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
         for (CanalEntry.RowData rowData : rowDataList) {
-            StringBuffer values = new StringBuffer();
-            rowData.getAfterColumnsList().forEach((c) -> {
-                values.append(c.getValue() + "\t");
-            });
-
+            StringBuffer values = getColumnValue(rowData);
+            values.append("\n");
             String insertDir = configParams.getInsertDirMerge();
             writeData(insertDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
         }
@@ -82,18 +83,16 @@ public class MyAnnoEventListener {
     private void getColumnDataOfUpdate(CanalEntry.RowChange rowChange, CanalMsg canalMsg) {
 
         String eventType = rowChange.getEventType().toString();
-        List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
+        List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
-        for (CanalEntry.RowData rowData : rowDatasList) {
-            StringBuffer values = new StringBuffer();
-            for (CanalEntry.Column column : rowData.getBeforeColumnsList()) {
-                values.append(column.getValue() + "\t");
-            }
-            values.deleteCharAt(values.length() - 1);
+        for (CanalEntry.RowData rowData : rowDataList) {
+            StringBuffer values = getColumnValue(rowData);
             values.append(",");
             for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
                 values.append(column.getValue() + "\t");
             }
+            values.deleteCharAt(values.length() - 1);
+            values.append("\n");
 
             String updateDir = configParams.getUpdateDirMerge();
             writeData(updateDir, values.toString(), eventType, canalMsg.getSchemaName(), canalMsg.getTableName());
