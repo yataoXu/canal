@@ -1,7 +1,5 @@
 package com.evan.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.map.MapUtil;
 import com.evan.config.property.ConfigParams;
 import com.evan.core.TableDetail;
 import com.evan.dao.BaseDao;
@@ -11,10 +9,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +61,7 @@ public class DataMergeServiceImpl implements DataMergeService {
 
 
     public void remove(List<String> list, String elem) {
-        if (list.isEmpty()) return;
+        if (CollectionUtils.isEmpty(list)) return;
         for (int i = list.size() - 1; i >= 0; i--) {
             if (list.get(i).equals(elem)) {
                 list.remove(list.get(i));
@@ -95,7 +96,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             // 将merge好的list落地
             List<String> allData = tableDetail.getData();
             String updateUploadPath = configParams.getDeletedDirUpload() + databaseName + f.getName() + f.getName();
-            writeDiskOfUploadData(updateUploadPath,databaseName,f.getName(),allData);
+            writeDiskOfUploadData(updateUploadPath, databaseName, f.getName(), allData);
 
             // 将merge好的list load 到hive
             baseDao.loadToTable(updateUploadPath, databaseName, f.getName());
@@ -140,7 +141,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             // 将merge好的list落地
             List<String> allData = tableDetail.getData();
             String updateUploadPath = configParams.getInsertDirUpload() + databaseName + f.getName() + f.getName();
-            writeDiskOfUploadData(updateUploadPath,databaseName,f.getName(),allData);
+            writeDiskOfUploadData(updateUploadPath, databaseName, f.getName(), allData);
 
 
             // 将merge好的list load 到hive
@@ -149,7 +150,7 @@ public class DataMergeServiceImpl implements DataMergeService {
         });
     }
 
-    public void dataMergeInsert(String databaseName) throws IOException, SQLException {
+    public void dataMergeInsert(@Nullable String databaseName) throws IOException, SQLException {
 
         String path = configParams.getInsertDirMerge();
         // 获得要上传的文件夹
@@ -178,14 +179,14 @@ public class DataMergeServiceImpl implements DataMergeService {
             // 将merge好的list落地
             List<String> allData = tableDetail.getData();
             String insertUploadPath = configParams.getInsertDirUpload() + databaseName + f.getName() + f.getName();
-            writeDiskOfUploadData(insertUploadPath,databaseName,f.getName(),allData);
+            writeDiskOfUploadData(insertUploadPath, databaseName, f.getName(), allData);
 
             // 将merge好的list load 到hive
             baseDao.loadToTable(insertUploadPath, databaseName, f.getName());
         });
     }
 
-    public void writeDiskOfUploadData(String path ,String databaseName,String tableName,List<String> data) {
+    public void writeDiskOfUploadData(String path, String databaseName, String tableName, List<String> data) {
         log.info("库名：{},表名：{}，数据：{}", databaseName, tableName, data);
         String allDataString = String.join("\n", data);
         FileUtils.writeFile(path, databaseName, tableName, allDataString);
