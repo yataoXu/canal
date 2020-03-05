@@ -77,26 +77,30 @@ public class DataMergeServiceImpl implements DataMergeService {
         String path = configParams.getDeletedDirMerge();
         // 获得上传的文件夹
         File insertDir = new File(path, databaseName);
-        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+        if (FileUtil.exist(insertDir) && FileUtil.isNotEmpty(insertDir)) {
+            Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
 
-            String line = null;
-            TableDetail tableDetail = new TableDetail();
-            tableDetail.setDatabase(databaseName);
-            tableDetail.setFile(f);
-            prepareMerge(tableDetail);
+                String line = null;
+                TableDetail tableDetail = new TableDetail();
+                tableDetail.setDatabase(databaseName);
+                tableDetail.setFile(f);
+                prepareMerge(tableDetail);
 
-            while (true) {
-                try {
-                    if (!((line = tableDetail.getBfreader().readLine()) != null)) break;
-                } catch (IOException e) {
-                    e.printStackTrace();
+                while (true) {
+                    try {
+                        if ((line = tableDetail.getBfreader().readLine()) == null) break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    remove(tableDetail.getData(), line);
                 }
-                remove(tableDetail.getData(), line);
-            }
 
-            laterStage(configParams.getDeletedDirMerge(), configParams.getDeletedDirUpload(), databaseName, f.getName(), tableDetail.getData());
+                laterStage(configParams.getDeletedDirMerge(), configParams.getDeletedDirUpload(), databaseName, f.getName(), tableDetail.getData());
 
-        });
+            });
+        } else {
+            log.error("在指定的文件夹:{}下未找到要同步的数据库:{}", path, databaseName);
+        }
     }
 
     public void dataMergeUpdate(String databaseName) throws IOException, SQLException {
@@ -104,38 +108,40 @@ public class DataMergeServiceImpl implements DataMergeService {
 
         // 获得上传的文件夹
         File insertDir = new File(path, databaseName);
-        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+        if (FileUtil.exist(insertDir) && FileUtil.isNotEmpty(insertDir)) {
+            Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+                TableDetail tableDetail = new TableDetail();
+                tableDetail.setDatabase(databaseName);
+                tableDetail.setFile(f);
+                prepareMerge(tableDetail);
 
-            TableDetail tableDetail = new TableDetail();
-            tableDetail.setDatabase(databaseName);
-            tableDetail.setFile(f);
-            prepareMerge(tableDetail);
-
-
-            Map<String, String> map = Maps.newLinkedHashMap();
-            String line = null;
-            while (true) {
-                try {
-                    if (!((line = tableDetail.getBfreader().readLine()) != null)) break;
-                } catch (IOException e) {
-                    e.printStackTrace();
+                Map<String, String> map = Maps.newLinkedHashMap();
+                String line = null;
+                while (true) {
+                    try {
+                        if ((line = tableDetail.getBfreader().readLine()) == null) break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    String[] split = line.split(",");
+                    map.put(split[0], split[1]);
                 }
-                String[] split = line.split(",");
-                map.put(split[0], split[1]);
-            }
 
-            for (Map.Entry<String, String> param : map.entrySet()) {
-                for (int i = 0; i < tableDetail.getData().size(); i++) {
-                    if (tableDetail.getData().get(i).equals(param.getKey())) {
-                        tableDetail.getData().remove(tableDetail.getData().get(i));
-                        tableDetail.getData().add(param.getValue());
+                for (Map.Entry<String, String> param : map.entrySet()) {
+                    for (int i = 0; i < tableDetail.getData().size(); i++) {
+                        if (tableDetail.getData().get(i).equals(param.getKey())) {
+                            tableDetail.getData().remove(tableDetail.getData().get(i));
+                            tableDetail.getData().add(param.getValue());
+                        }
                     }
                 }
-            }
 
-            laterStage(configParams.getUpdateDirMerge(), configParams.getUpdateDirUpload(), databaseName, f.getName(), tableDetail.getData());
+                laterStage(configParams.getUpdateDirMerge(), configParams.getUpdateDirUpload(), databaseName, f.getName(), tableDetail.getData());
 
-        });
+            });
+        } else {
+            log.error("在指定的文件夹:{}下未找到要同步的数据库:{}", path, databaseName);
+        }
     }
 
     public void dataMergeInsert(@Nullable String databaseName) throws IOException, SQLException {
@@ -144,29 +150,34 @@ public class DataMergeServiceImpl implements DataMergeService {
         log.info("需要merge的路径:{}", path);
         // 获得要上传的文件夹
         File insertDir = new File(path, databaseName);
-        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
-            log.info("需要merge的文件:{}", f.getAbsolutePath());
-            List<String> addList = Lists.newArrayList();
-            TableDetail tableDetail = new TableDetail();
-            tableDetail.setDatabase(databaseName);
-            tableDetail.setFile(f);
-            prepareMerge(tableDetail);
+        if (FileUtil.exist(insertDir) && FileUtil.isNotEmpty(insertDir)) {
+            Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+                log.info("需要merge的文件:{}", f.getAbsolutePath());
+                List<String> addList = Lists.newArrayList();
+                TableDetail tableDetail = new TableDetail();
+                tableDetail.setDatabase(databaseName);
+                tableDetail.setFile(f);
 
-            String line = null;
-            while (true) {
-                try {
-                    if (!((line = tableDetail.getBfreader().readLine()) != null)) break;
-                } catch (IOException e) {
-                    e.printStackTrace();
+                prepareMerge(tableDetail);
+
+                String line = null;
+                while (true) {
+                    try {
+                        if ((line = tableDetail.getBfreader().readLine()) == null) break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    addList.add(line);
                 }
-                addList.add(line);
-            }
-            if (!addList.isEmpty()) {
-                tableDetail.getData().addAll(addList);
-            }
+                if (!addList.isEmpty()) {
+                    tableDetail.getData().addAll(addList);
+                }
 
-            laterStage(configParams.getInsertDirMerge(), configParams.getInsertDirUpload(), databaseName, f.getName(), tableDetail.getData());
-        });
+                laterStage(configParams.getInsertDirMerge(), configParams.getInsertDirUpload(), databaseName, f.getName(), tableDetail.getData());
+            });
+        } else {
+            log.error("在指定的文件夹:{}下未找到要同步的数据库:{}", path, databaseName);
+        }
     }
 
 

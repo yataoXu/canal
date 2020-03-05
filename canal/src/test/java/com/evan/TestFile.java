@@ -208,19 +208,35 @@ public class TestFile {
     public void testFilter() {
         String child = "evan";
         File insertDir = new File("F:\\hadoop\\mysql\\merge\\insert",child);
-        File[] files = insertDir.listFiles();
-        String[] list = insertDir.list();
-        for (File file : insertDir.listFiles()){
-            System.out.println(file.isDirectory());
-            System.out.println(file.getName());
+        System.out.println(FileUtil.exist(insertDir));
+
+        if (FileUtil.exist(insertDir)){
+            Arrays.stream(insertDir.listFiles()).forEach((f)->{
+                System.out.println(f.getName());
+                System.out.println(f.isDirectory());
+
+
+
+            });
+        }else {
+            System.out.println("在指定的文件夹下未找到要同步的数据库");
         }
 
-        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+//        File[] files = insertDir.listFiles();
+//        String[] list = insertDir.list();
+//        for (File file : insertDir.listFiles()){
+//            System.out.println(file.isDirectory());
+//            System.out.println(file.getName());
+//        }
 
+//        System.out.println(FileUtil.isDirEmpty(insertDir));
 
-            System.out.println(f.getName());
-
-        });
+//        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+//
+//
+//            System.out.println(f.getName());
+//
+//        });
     }
 
 }
