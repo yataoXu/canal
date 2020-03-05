@@ -44,3 +44,4 @@ dir:
   updateDirMerge: /home/hive/increment_data/merge/update
   insertDirUpload: /home/hive/increment_data/upload/insert
   insertDirMerge: /home/hive/increment_data/merge/insert
+  backup: /home/hive/increment_data/backup

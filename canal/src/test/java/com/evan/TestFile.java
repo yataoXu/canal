@@ -1,5 +1,7 @@
 package com.evan;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
@@ -202,23 +204,26 @@ public class TestFile {
         String now = DateUtil.today();
 
         System.out.println(now);
+
+
+        DateTime yesterday = DateUtil.yesterday();
+        System.out.println(yesterday.toString(DatePattern.NORM_DATE_PATTERN));
     }
 
     @Test
     public void testFilter() {
         String child = "evan";
-        File insertDir = new File("F:\\hadoop\\mysql\\merge\\insert",child);
+        File insertDir = new File("F:\\hadoop\\mysql\\merge\\insert", child);
         System.out.println(FileUtil.exist(insertDir));
 
-        if (FileUtil.exist(insertDir)){
-            Arrays.stream(insertDir.listFiles()).forEach((f)->{
+        if (FileUtil.exist(insertDir)) {
+            Arrays.stream(insertDir.listFiles()).forEach((f) -> {
                 System.out.println(f.getName());
                 System.out.println(f.isDirectory());
 
 
-
             });
-        }else {
+        } else {
             System.out.println("在指定的文件夹下未找到要同步的数据库");
         }
 

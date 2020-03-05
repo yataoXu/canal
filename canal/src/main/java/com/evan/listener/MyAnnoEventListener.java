@@ -1,5 +1,6 @@
 package com.evan.listener;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.evan.annotation.CanalEventListener;
 import com.evan.annotation.ddl.AlertTableListenPoint;
@@ -72,7 +73,8 @@ public class MyAnnoEventListener {
 
     private void writeData(String path, String content, String schemaName, String tableName, String type) {
         log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, type, content);
-        FileUtils.writeFile(path, schemaName, tableName, content);
+        String today = DateUtil.today();
+        FileUtils.writeFile(path, schemaName, tableName, content,today);
     }
 
 

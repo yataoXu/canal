@@ -21,6 +21,7 @@ public class ConfigParams {
     private String updateDirUpload;
     private String insertDirMerge;
     private String insertDirUpload;
+    private String backup;
 
 
 }
