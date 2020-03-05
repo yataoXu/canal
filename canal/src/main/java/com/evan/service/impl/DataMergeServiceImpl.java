@@ -99,7 +99,7 @@ public class DataMergeServiceImpl implements DataMergeService {
 
             });
         } else {
-            log.error("在指定的文件夹:{}下未找到要同步的数据库:{}", path, databaseName);
+            log.error("在指定的文件夹: {}下未找到要同步的数据库: {}", path, databaseName);
         }
     }
 
@@ -140,19 +140,19 @@ public class DataMergeServiceImpl implements DataMergeService {
 
             });
         } else {
-            log.error("在指定的文件夹:{}下未找到要同步的数据库:{}", path, databaseName);
+            log.error("在指定的文件夹: {}下未找到要同步的数据库: {}", path, databaseName);
         }
     }
 
     public void dataMergeInsert(@Nullable String databaseName) throws IOException, SQLException {
 
         String path = configParams.getInsertDirMerge();
-        log.info("需要merge的路径:{}", path);
+        log.info("需要merge的路径: {}", path);
         // 获得要上传的文件夹
         File insertDir = new File(path, databaseName);
         if (FileUtil.exist(insertDir) && FileUtil.isNotEmpty(insertDir)) {
             Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
-                log.info("需要merge的文件:{}", f.getAbsolutePath());
+                log.info("需要merge的文件: {}", f.getAbsolutePath());
                 List<String> addList = Lists.newArrayList();
                 TableDetail tableDetail = new TableDetail();
                 tableDetail.setDatabase(databaseName);
@@ -184,21 +184,21 @@ public class DataMergeServiceImpl implements DataMergeService {
     private void laterStage(String mergePathDir, String uploadPathDir, String databaseName, String fileName, List<String> data) {
         // 将merge好的list落地
         String uploadPath = uploadPathDir + "/" + databaseName + "/" + fileName + "/" + fileName;
-        log.info("将merge好的list落地到 {}", uploadPath);
+        log.info("将merge好的list落地到: {}", uploadPath);
         writeDiskOfUploadData(uploadPathDir, databaseName, fileName, data);
         // 清空mergeDir
         String mergePath = mergePathDir + "/" + databaseName + "/" + fileName + "/" + fileName;
         boolean del = FileUtil.del(mergePath);
-        log.info("清空mergeDir {},执行结果为{}", mergePath, del);
+        log.info("清空mergeDir: {},执行结果为: {}", mergePath, del);
 
 
         // 将merge好的list load 到hive
         ResultDTO resultDTO = baseDao.loadToTable(uploadPath, databaseName, fileName);
-        log.info("将表：{} merge好的数据 load 到hive {}库中", fileName, databaseName);
+        log.info("将表: {} merge好的数据 load 到hive: {}库中", fileName, databaseName);
         if (resultDTO.getStatus()) {
             // 删除 uploadDir下已经上传的文件
             boolean del1 = FileUtil.del(uploadPath);
-            log.info("删除 uploadDir:{}下已经上传的文件,执行结果为{}", uploadPath, del1);
+            log.info("删除 uploadDir: {}下已经上传的文件,执行结果为: {}", uploadPath, del1);
         }
 
 
