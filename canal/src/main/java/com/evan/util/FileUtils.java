@@ -53,7 +53,7 @@ public class FileUtils {
 
         String now = DateUtil.today();
 
-        File srcDirFile = new File(path + "/" + schemaName + "/" + "/" + tableName  + "/" + tableName);
+        File srcDirFile = new File(path + "/" + schemaName + "/" + "/" + tableName + "/" + tableName + now);
         if (!srcDirFile.getParentFile().exists()) {
             boolean mkdirs = srcDirFile.getParentFile().mkdirs();
             if (!mkdirs) {

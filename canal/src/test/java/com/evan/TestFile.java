@@ -1,5 +1,7 @@
 package com.evan;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -138,12 +140,12 @@ public class TestFile {
         String database = "mysql_to_hive";
 
         // 获得要上传的文件夹
-        File insertDir = new File(path , database);
+        File insertDir = new File(path, database);
         Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
             InputStreamReader reader = null;
             try {
                 // 获得要上传的文件
-                File file = new File(f.getAbsolutePath() , f.getName());
+                File file = new File(f.getAbsolutePath(), f.getName());
                 reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
             } catch (UnsupportedEncodingException e1) {
                 e1.printStackTrace();
@@ -169,7 +171,7 @@ public class TestFile {
 
 
     @Test
-    public void testListToMap(){
+    public void testListToMap() {
         List<String> beforeList = Lists.newArrayList();
         beforeList.add("before1");
         beforeList.add("before2");
@@ -181,19 +183,44 @@ public class TestFile {
         afterList.add("afterList3");
         afterList.add("afterList4");
 
-//        Map<String,String> map = Maps.newLinkedHashMap();
-//
-//        for (int i = 0; i < beforeList.size(); i++) {
-//            if(StringUtils.isNotBlank(beforeList.get(i)) &&StringUtils.isNotBlank(afterList.get(i))){
-//                map.put(beforeList.get(i),afterList.get(i));
-//            }
-//        }
-//
-//        map.forEach((k,v)->{
-//            System.out.println(k+":"+v);
-//        });
+        Map<String, String> map = Maps.newLinkedHashMap();
+
+        for (int i = 0; i < beforeList.size(); i++) {
+            if (StringUtils.isNotBlank(beforeList.get(i)) && StringUtils.isNotBlank(afterList.get(i))) {
+                map.put(beforeList.get(i), afterList.get(i));
+            }
+        }
+
+        map.forEach((k, v) -> {
+            System.out.println(k + ":" + v);
+        });
 
         String join = String.join("\n", afterList);
         System.out.println(join);
+
+
+        String now = DateUtil.today();
+
+        System.out.println(now);
     }
+
+    @Test
+    public void testFilter() {
+        String child = "evan";
+        File insertDir = new File("F:\\hadoop\\mysql\\merge\\insert",child);
+        File[] files = insertDir.listFiles();
+        String[] list = insertDir.list();
+        for (File file : insertDir.listFiles()){
+            System.out.println(file.isDirectory());
+            System.out.println(file.getName());
+        }
+
+        Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+
+
+            System.out.println(f.getName());
+
+        });
+    }
+
 }

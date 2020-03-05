@@ -3,7 +3,7 @@ package com.evan.service.impl;
 import cn.hutool.core.io.FileUtil;
 import com.evan.DTO.ResultDTO;
 import com.evan.config.property.ConfigParams;
-import com.evan.core.TableDetail;
+import com.evan.DTO.TableDetail;
 import com.evan.dao.BaseDao;
 import com.evan.service.DataMergeService;
 import com.evan.util.FileUtils;
