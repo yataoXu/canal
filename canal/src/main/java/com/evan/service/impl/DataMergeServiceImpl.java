@@ -37,7 +37,7 @@ public class DataMergeServiceImpl implements DataMergeService {
     @Autowired
     ConfigParams configParams;
 
-    public void mergeInit(TableDetail tableDetail) {
+    public void prepareMerge(TableDetail tableDetail) {
         InputStreamReader reader;
         try {
             // 获得上传的文件
@@ -83,7 +83,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             TableDetail tableDetail = new TableDetail();
             tableDetail.setDatabase(databaseName);
             tableDetail.setFile(f);
-            mergeInit(tableDetail);
+            prepareMerge(tableDetail);
 
             while (true) {
                 try {
@@ -109,7 +109,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             TableDetail tableDetail = new TableDetail();
             tableDetail.setDatabase(databaseName);
             tableDetail.setFile(f);
-            mergeInit(tableDetail);
+            prepareMerge(tableDetail);
 
 
             Map<String, String> map = Maps.newLinkedHashMap();
@@ -150,7 +150,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             TableDetail tableDetail = new TableDetail();
             tableDetail.setDatabase(databaseName);
             tableDetail.setFile(f);
-            mergeInit(tableDetail);
+            prepareMerge(tableDetail);
 
             String line = null;
             while (true) {
@@ -186,7 +186,8 @@ public class DataMergeServiceImpl implements DataMergeService {
         log.info("将表：{} merge好的数据 load 到hive {}库中", fileName, databaseName);
         if (resultDTO.getStatus()) {
             // 删除 uploadDir下已经上传的文件
-            FileUtil.del(uploadPath);
+            boolean del1 = FileUtil.del(uploadPath);
+            log.info("删除 uploadDir:{}下已经上传的文件,执行结果为{}", uploadPath, del1);
         }
 
 
