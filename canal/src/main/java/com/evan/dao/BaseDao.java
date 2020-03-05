@@ -27,14 +27,11 @@ import java.util.LinkedList;
 public class BaseDao {
     @Autowired
     @Qualifier("hiveDruidDataSource")
-    DataSource druidDataSource;
+    private DataSource druidDataSource;
 
     @Autowired
     @Qualifier("hiveDruidTemplate")
     private JdbcTemplate hiveDruidTemplate;
-
-    @Autowired
-    ConfigParams configParams;
 
     public LinkedList<String> getListByTableName(String databaseName, String tableName) {
         try {

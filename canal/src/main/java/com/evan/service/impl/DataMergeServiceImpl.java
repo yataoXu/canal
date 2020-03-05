@@ -9,6 +9,7 @@ import com.evan.service.DataMergeService;
 import com.evan.util.FileUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
@@ -29,13 +30,12 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class DataMergeServiceImpl implements DataMergeService {
 
-    @Autowired
-    BaseDao baseDao;
+    private final BaseDao baseDao;
 
-    @Autowired
-    ConfigParams configParams;
+    private final ConfigParams configParams;
 
     public void prepareMerge(TableDetail tableDetail) {
         InputStreamReader reader;

@@ -1,7 +1,6 @@
 package com.evan.config.property;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -11,8 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @Created by Evan
  */
 @ConfigurationProperties(prefix = "hive")
-@Getter
-@Setter
+@Data
 public class HiveDruidProperty {
     private String url;
     private String user;
