@@ -1,6 +1,6 @@
 package com.evan.service.impl;
 
-import com.evan.entity.TableData;
+import com.evan.DTO.TableData;
 import com.evan.service.HiveSqlBuilderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

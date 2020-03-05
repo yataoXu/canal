@@ -1,5 +1,6 @@
 package com.evan.dao;
 
+import com.evan.DTO.ResultDTO;
 import com.evan.config.property.ConfigParams;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -37,13 +39,13 @@ public class BaseDao {
     @Autowired
     ConfigParams configParams;
 
-    public List<String> getListByTableName(String databaseName, String tableName) {
+    public LinkedList<String> getListByTableName(String databaseName, String tableName) {
         try {
             Statement statement = druidDataSource.getConnection().createStatement();
             String sql = "select * from " + databaseName + "." + tableName;
             log.info("Running: " + sql);
             ResultSet res = statement.executeQuery(sql);
-            List<String> list = new ArrayList();
+            LinkedList<String> list = Lists.newLinkedList();
             int count = res.getMetaData().getColumnCount();
             String str = null;
             while (res.next()) {
@@ -58,20 +60,23 @@ public class BaseDao {
             return list;
         } catch (Exception e) {
             log.error(e.getMessage());
-            return Lists.newArrayList();
+            return Lists.newLinkedList();
         }
     }
 
-    public String loadToTable(String filepath, String databaseName, String tableName) {
-        String sql = "load data local inpath '" + filepath + "' into table " + databaseName + "." + tableName;
-        String result = "Load data into table successfully...";
-
+    public ResultDTO loadToTable(String filepath, String databaseName, String tableName) {
+        ResultDTO result = new ResultDTO();
+        String sql = "load data local inpath '" + filepath + "'OVERWRITE into table " + databaseName + "." + tableName;
+        log.info("表：{}，执行 sql:{}", tableName, sql);
         try {
             hiveDruidTemplate.execute(sql);
-        } catch (DataAccessException dae) {
-            result = "Load data into table encounter an error: " + dae.getMessage();
-            log.error(result);
+            result.setStatus(true);
+        } catch (DataAccessException date) {
+            result.setStatus(false);
+            result.setMessage("Load data into table encounter an error: " + date.getMessage());
+            log.error(date.getMessage());
         }
         return result;
     }
+
 }

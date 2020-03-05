@@ -44,14 +44,15 @@ public class MyAnnoEventListener {
         log.info("删除数据操作");
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
         for (CanalEntry.RowData rowData : rowDataList) {
-            StringBuffer values = getColumnValue(rowData);
+            StringBuffer values = getBeforeColumnValue(rowData);
             values.append("\n");
             String deleteDir = configParams.getDeletedDirMerge();
-            writeData(deleteDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName());
+            writeData(deleteDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName(), rowChange.getEventType().toString());
         }
     }
 
-    private StringBuffer getColumnValue(CanalEntry.RowData rowData) {
+
+    private StringBuffer getBeforeColumnValue(CanalEntry.RowData rowData) {
         StringBuffer values = new StringBuffer();
         for (CanalEntry.Column column : rowData.getBeforeColumnsList()) {
             values.append(column.getValue() + "\t");
@@ -60,8 +61,17 @@ public class MyAnnoEventListener {
         return values;
     }
 
-    private void writeData(String path, String content, String schemaName, String tableName) {
-        log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, content);
+    private StringBuffer getAfterColumnValue(CanalEntry.RowData rowData) {
+        StringBuffer values = new StringBuffer();
+        for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
+            values.append(column.getValue() + "\t");
+        }
+        values.deleteCharAt(values.length() - 1);
+        return values;
+    }
+
+    private void writeData(String path, String content, String schemaName, String tableName, String type) {
+        log.info("库名：{},表名：{}，操作类型：{},数据：{}", schemaName, tableName, type, content);
         FileUtils.writeFile(path, schemaName, tableName, content);
     }
 
@@ -71,10 +81,10 @@ public class MyAnnoEventListener {
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
         for (CanalEntry.RowData rowData : rowDataList) {
-            StringBuffer values = getColumnValue(rowData);
+            StringBuffer values = getAfterColumnValue(rowData);
             values.append("\n");
             String insertDir = configParams.getInsertDirMerge();
-            writeData(insertDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName());
+            writeData(insertDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName(), rowChange.getEventType().toString());
         }
     }
 
@@ -83,16 +93,20 @@ public class MyAnnoEventListener {
         List<CanalEntry.RowData> rowDataList = rowChange.getRowDatasList();
 
         for (CanalEntry.RowData rowData : rowDataList) {
-            StringBuffer values = getColumnValue(rowData);
+            StringBuffer values = getBeforeColumnValue(rowData);
             values.append(",");
-            for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
-                values.append(column.getValue() + "\t");
-            }
-            values.deleteCharAt(values.length() - 1);
+
+            StringBuffer afterColumnValue = getAfterColumnValue(rowData);
+            values.append(afterColumnValue);
+
+//            for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
+//                values.append(column.getValue() + "\t");
+//            }
+//            values.deleteCharAt(values.length() - 1);
             values.append("\n");
 
             String updateDir = configParams.getUpdateDirMerge();
-            writeData(updateDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName());
+            writeData(updateDir, values.toString(), canalMsg.getSchemaName(), canalMsg.getTableName(), rowChange.getEventType().toString());
         }
     }
 

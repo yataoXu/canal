@@ -1,5 +1,7 @@
 package com.evan.service.impl;
 
+import cn.hutool.core.io.FileUtil;
+import com.evan.DTO.ResultDTO;
 import com.evan.config.property.ConfigParams;
 import com.evan.core.TableDetail;
 import com.evan.dao.BaseDao;
@@ -15,7 +17,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +52,7 @@ public class DataMergeServiceImpl implements DataMergeService {
 
         // 得到原有数据
         try {
-            List<String> list = baseDao.getListByTableName(tableDetail.getDatabase(), tableDetail.getFile().getName());
+            LinkedList<String> list = baseDao.getListByTableName(tableDetail.getDatabase(), tableDetail.getFile().getName());
             tableDetail.setData(list);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -92,14 +94,8 @@ public class DataMergeServiceImpl implements DataMergeService {
                 remove(tableDetail.getData(), line);
             }
 
+            laterStage(configParams.getDeletedDirMerge(), configParams.getDeletedDirUpload(), databaseName, f.getName(), tableDetail.getData());
 
-            // 将merge好的list落地
-            List<String> allData = tableDetail.getData();
-            String updateUploadPath = configParams.getDeletedDirUpload() + databaseName + f.getName() + f.getName();
-            writeDiskOfUploadData(updateUploadPath, databaseName, f.getName(), allData);
-
-            // 将merge好的list load 到hive
-            baseDao.loadToTable(updateUploadPath, databaseName, f.getName());
         });
     }
 
@@ -129,7 +125,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             }
 
             for (Map.Entry<String, String> param : map.entrySet()) {
-                for (int i = 0; i < tableDetail.getData().size() - 1; i++) {
+                for (int i = 0; i < tableDetail.getData().size(); i++) {
                     if (tableDetail.getData().get(i).equals(param.getKey())) {
                         tableDetail.getData().remove(tableDetail.getData().get(i));
                         tableDetail.getData().add(param.getValue());
@@ -137,25 +133,19 @@ public class DataMergeServiceImpl implements DataMergeService {
                 }
             }
 
+            laterStage(configParams.getUpdateDirMerge(), configParams.getUpdateDirUpload(), databaseName, f.getName(), tableDetail.getData());
 
-            // 将merge好的list落地
-            List<String> allData = tableDetail.getData();
-            String updateUploadPath = configParams.getInsertDirUpload() + databaseName + f.getName() + f.getName();
-            writeDiskOfUploadData(updateUploadPath, databaseName, f.getName(), allData);
-
-
-            // 将merge好的list load 到hive
-            String filePaht = "";
-            baseDao.loadToTable(filePaht, databaseName, f.getName());
         });
     }
 
     public void dataMergeInsert(@Nullable String databaseName) throws IOException, SQLException {
 
         String path = configParams.getInsertDirMerge();
+        log.info("需要merge的路径:{}", path);
         // 获得要上传的文件夹
         File insertDir = new File(path, databaseName);
         Lists.newArrayList(insertDir.listFiles()).stream().forEach(f -> {
+            log.info("需要merge的文件:{}", f.getAbsolutePath());
             List<String> addList = Lists.newArrayList();
             TableDetail tableDetail = new TableDetail();
             tableDetail.setDatabase(databaseName);
@@ -174,16 +164,32 @@ public class DataMergeServiceImpl implements DataMergeService {
             if (!addList.isEmpty()) {
                 tableDetail.getData().addAll(addList);
             }
-            tableDetail.getData().stream().forEach(System.out::println);
 
-            // 将merge好的list落地
-            List<String> allData = tableDetail.getData();
-            String insertUploadPath = configParams.getInsertDirUpload() + databaseName + f.getName() + f.getName();
-            writeDiskOfUploadData(insertUploadPath, databaseName, f.getName(), allData);
-
-            // 将merge好的list load 到hive
-            baseDao.loadToTable(insertUploadPath, databaseName, f.getName());
+            laterStage(configParams.getInsertDirMerge(), configParams.getInsertDirUpload(), databaseName, f.getName(), tableDetail.getData());
         });
+    }
+
+
+    private void laterStage(String mergePathDir, String uploadPathDir, String databaseName, String fileName, List<String> data) {
+        // 将merge好的list落地
+        String uploadPath = uploadPathDir + "/" + databaseName + "/" + fileName + "/" + fileName;
+        log.info("将merge好的list落地到 {}", uploadPath);
+        writeDiskOfUploadData(uploadPathDir, databaseName, fileName, data);
+        // 清空mergeDir
+        String mergePath = mergePathDir + "/" + databaseName + "/" + fileName + "/" + fileName;
+        boolean del = FileUtil.del(mergePath);
+        log.info("清空mergeDir {},执行结果为{}", mergePath, del);
+
+
+        // 将merge好的list load 到hive
+        ResultDTO resultDTO = baseDao.loadToTable(uploadPath, databaseName, fileName);
+        log.info("将表：{} merge好的数据 load 到hive {}库中", fileName, databaseName);
+        if (resultDTO.getStatus()) {
+            // 删除 uploadDir下已经上传的文件
+            FileUtil.del(uploadPath);
+        }
+
+
     }
 
     public void writeDiskOfUploadData(String path, String databaseName, String tableName, List<String> data) {

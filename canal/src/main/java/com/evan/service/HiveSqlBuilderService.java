@@ -1,7 +1,7 @@
 package com.evan.service;
 
 
-import com.evan.entity.TableData;
+import com.evan.DTO.TableData;
 
 public interface HiveSqlBuilderService {
 

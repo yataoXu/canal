@@ -5,6 +5,7 @@ import lombok.Data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class TableDetail {
 
     private String tableName;
 
-    private List<String> data;
+    private LinkedList<String> data;
 
     private String path;
 

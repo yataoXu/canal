@@ -1,4 +1,4 @@
-package com.evan.entity;
+package com.evan.DTO;
 
 import lombok.Data;
 

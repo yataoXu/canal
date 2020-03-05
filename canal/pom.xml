@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.evan</groupId>
     <artifactId>canal</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <name>canal</name>
     <description>Demo project for Spring Boot</description>
