@@ -219,7 +219,7 @@ public class DataMergeServiceImpl implements DataMergeService {
             // 将 uploadDir下已经上传的文件备份到backup目录下
             String backup = configParams.getBackup() + "/" + fileName + DateTimeUtils.currentTimeMillis();
             FileUtil.move(new File(uploadPath), new File(backup), true);
-            log.info("将 uploadDir: {}下已经上传的文件,备份到backup目录下，文件名为:", uploadPath, backup);
+            log.info("将 uploadDir: {}下已经上传的文件,备份到backup目录下，文件名为: {}", uploadPath, backup);
         }
 
 
