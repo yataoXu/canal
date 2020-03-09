@@ -5,10 +5,9 @@ import com.alibaba.otter.canal.client.CanalConnector;
 import com.alibaba.otter.canal.protocol.Message;
 import com.alibaba.otter.canal.protocol.exception.CanalClientException;
 import com.evan.annotation.CanalEventListener;
-import com.evan.core.ListenerPoint;
 import com.evan.config.property.CanalProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.evan.core.ListenerPoint;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Objects;
  * @Author Evan
  * @date 2019.10.14 13:30
  */
+@Slf4j
 public abstract class AbstractMessageTransponder implements MessageTransponder {
 
     /**
@@ -54,11 +54,6 @@ public abstract class AbstractMessageTransponder implements MessageTransponder {
      * canal 客户端的运行状态
      */
     private volatile boolean running = true;
-
-    /**
-     * 日志记录
-     */
-    private static final Logger logger = LoggerFactory.getLogger(AbstractMessageTransponder.class);
 
     /**
      * 构造方法，初始化参数
@@ -104,13 +99,13 @@ public abstract class AbstractMessageTransponder implements MessageTransponder {
                 //消息数
                 int size = message.getEntries().size();
                 //debug 模式打印消息数
-                if (logger.isDebugEnabled()) {
-                    logger.debug("{}: 从 canal 服务器获取消息： >>>>> 数:{}", threadName, size);
+                if (log.isDebugEnabled()) {
+                    log.debug("{}: 从 canal 服务器获取消息： >>>>> 数:{}", threadName, size);
                 }
                 //若是没有消息
                 if (batchId == -1 || size == 0) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("{}: 没有任何消息啊，我休息{}毫秒", threadName, interval);
+                    if (log.isDebugEnabled()) {
+                        log.debug("{}: 没有任何消息啊，我休息{}毫秒", threadName, interval);
                     }
                     //休息
                     Thread.sleep(interval);
@@ -121,13 +116,13 @@ public abstract class AbstractMessageTransponder implements MessageTransponder {
                 //确认消息已被处理完
                 connector.ack(batchId);
                 //若是 debug模式
-                if (logger.isDebugEnabled()) {
-                    logger.debug("{}: 确认消息已被消费，消息ID:{}", threadName, batchId);
+                if (log.isDebugEnabled()) {
+                    log.debug("{}: 确认消息已被消费，消息ID:{}", threadName, batchId);
                 }
             } catch (CanalClientException e) {
                 //每次错误，重试次数减一处理
                 errorCount--;
-                logger.error(threadName + ": 发生错误!! ", e);
+                log.error(threadName + ": 发生错误!! ", e);
                 try {
                     //等待时间
                     Thread.sleep(interval);
@@ -143,13 +138,13 @@ public abstract class AbstractMessageTransponder implements MessageTransponder {
                 if (errorCount <= 0) {
                     //停止 canal 客户端
                     stop();
-                    logger.info("{}: canal 客户端已停止... ", Thread.currentThread().getName());
+                    log.info("{}: canal 客户端已停止... ", Thread.currentThread().getName());
                 }
             }
         }
         //停止 canal 客户端
         stop();
-        logger.info("{}: canal 客户端已停止. ", Thread.currentThread().getName());
+        log.info("{}: canal 客户端已停止. ", Thread.currentThread().getName());
     }
 
     /**

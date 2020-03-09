@@ -73,4 +73,20 @@ public class BaseDao {
         return result;
     }
 
+    public ResultDTO dropTable(String databaseName, String tableName) {
+
+        ResultDTO result = new ResultDTO();
+        String sql = "DROP TABLE IF EXISTS " + databaseName + "." + tableName;
+        log.info("Running: " + sql);
+        try {
+            hiveDruidTemplate.execute(sql);
+            result.setStatus(true);
+        } catch (DataAccessException dae) {
+            result.setMessage("Drop table encounter an error: " + dae.getMessage());
+            result.setStatus(false);
+            log.error(result.getMessage());
+        }
+        return result;
+    }
+
 }

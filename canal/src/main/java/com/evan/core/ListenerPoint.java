@@ -1,9 +1,9 @@
 package com.evan.core;
 
 import com.evan.annotation.ListenPoint;
+import com.google.common.collect.Maps;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +21,7 @@ public class ListenerPoint {
     /**
      * 监听的方法和节点
      */
-    private Map<Method, ListenPoint> invokeMap = new HashMap<>();
+    private Map<Method, ListenPoint> invokeMap = Maps.newHashMap();
 
     /**
      * 构造方法，设置目标，方法以及注解类型

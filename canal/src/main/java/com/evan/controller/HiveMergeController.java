@@ -66,4 +66,19 @@ public class HiveMergeController {
         return "success";
     }
 
+    @GetMapping(value = "total/{databaseName}")
+    public String totalMerge(@PathVariable("databaseName") String databaseName) {
+
+        try {
+            dataMergeService.dataMergeDelete(databaseName);
+            dataMergeService.dataMergeUpdate(databaseName);
+            dataMergeService.dataMergeInsert(databaseName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "success";
+    }
+
 }
