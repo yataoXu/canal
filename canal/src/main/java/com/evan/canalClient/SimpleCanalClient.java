@@ -43,7 +43,6 @@ public class SimpleCanalClient extends AbstractCanalClient {
     private final List<ListenerPoint> annoListeners = new ArrayList<>();
 
 
-
     /**
      * 构造方法，进行一些基本信息初始化
      *
@@ -71,21 +70,6 @@ public class SimpleCanalClient extends AbstractCanalClient {
     }
 
     /**
-     * 关闭 canal 客户端
-     *
-     * @param
-     * @return
-     */
-    @Override
-    public void stop() {
-        //停止 canal 客户端
-        super.stop();
-
-        //线程池关闭
-        executor.shutdown();
-    }
-
-    /**
      * 初始化监听器
      *
      * @param
@@ -96,7 +80,7 @@ public class SimpleCanalClient extends AbstractCanalClient {
         //获取监听器
         List<CanalEventListener> list = BeanUtil.getBeansOfType(CanalEventListener.class);
 
-        if (list != null) {
+        if (!list.isEmpty()) {
             //若存在目标监听，放入 listenerMap
             listeners.addAll(list);
         }

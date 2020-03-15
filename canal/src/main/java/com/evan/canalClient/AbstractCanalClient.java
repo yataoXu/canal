@@ -19,10 +19,6 @@ import java.util.Objects;
  * @date 2019.10.14 13:09
  */
 public abstract class AbstractCanalClient {
-    /**
-     * 运行状态
-     */
-    private volatile boolean running;
 
     /**
      * canal 配置
@@ -94,7 +90,7 @@ public abstract class AbstractCanalClient {
         }
         //canal 连接
         connector.connect();
-        if (!StringUtils.isEmpty(instance.getFilter())) {
+        if (StringUtils.isNotEmpty(instance.getFilter())) {
             //canal 连接订阅，包含过滤规则
             connector.subscribe(instance.getFilter());
         } else {
@@ -127,33 +123,4 @@ public abstract class AbstractCanalClient {
         }
     }
 
-    /**
-     * 停止 canal 客户端
-     *
-     * @param
-     * @return
-     */
-    public void stop() {
-        setRunning(false);
-    }
-
-    /**
-     * 返回 canal 客户端的状态
-     *
-     * @param
-     * @return
-     */
-    public boolean isRunning() {
-        return running;
-    }
-
-    /**
-     * 设置 canal 客户端状态
-     *
-     * @param running
-     * @return
-     */
-    private void setRunning(boolean running) {
-        this.running = running;
-    }
 }
