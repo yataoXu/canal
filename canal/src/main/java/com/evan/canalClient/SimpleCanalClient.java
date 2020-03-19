@@ -54,7 +54,7 @@ public class SimpleCanalClient extends AbstractCanalClient {
         //这边上可能需要调整，默认核心线程数5个，最大线程数20个，线程两分钟分钟不执行就。。。
         executor = new ThreadPoolExecutor(5, 20,
                 120L, TimeUnit.SECONDS,
-                new SynchronousQueue<>(), Executors.defaultThreadFactory());
+                new SynchronousQueue<>(), new CustomerThreadFactory());
         //初始化监听器
         initListeners();
     }
